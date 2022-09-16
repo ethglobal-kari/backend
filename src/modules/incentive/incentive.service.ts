@@ -9,9 +9,12 @@ import { QueryBuilder, Repository } from 'typeorm';
 import { IncentiveDto } from './incentive.dto';
 import { MerkleService } from './merkle.service';
 import { v4 as uuidv4 } from 'uuid'
+import { ethers } from 'ethers'
+import * as FactoryArtifact from '../../../abis/DistributorFactory.json'
 
 @Injectable()
 export class IncentiveService {
+
 
     constructor(
         private readonly configService: ConfigService,
@@ -36,7 +39,15 @@ export class IncentiveService {
         const incentiveId = uuidv4()
         const merkle = this.merkleService.createProofs(incentiveId, addresses, amount)
         // deploy contract
-
+        const rpcUrl = this.configService.get<string>(`eth.network[${incentiveDto.chainId}]`)
+        const privateKey = this.configService.get<string>('eth.privateKey')
+        const factoryAddress = this.configService.get<string>(`eth.factory[${incentiveDto.chainId}]`)
+        const provider = ethers.providers.getDefaultProvider(rpcUrl)
+        const wallet = new ethers.Wallet(privateKey, provider)
+        const factory = new ethers.Contract(factoryAddress, FactoryArtifact.abi, wallet)
+        const tx = await factory.createDistributor(incentiveDto.tokenAddress, merkle.rootHash, incentiveId)
+        const response = await tx.wait()
+        const contractAddress = response.events[0].args.distributor
         // get contract address & save to incentive
     }
 }

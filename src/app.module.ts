@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config'
 import { IncentiveModule } from './modules/incentive/incentive.module';
 import { CampaignModule } from './modules/campaign/campaign.module';
-import { dbConfig } from './configs';
+import { dbConfig, generalConfig } from './configs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import * as path from 'path'
@@ -13,7 +13,7 @@ import * as path from 'path'
   imports: [
     ConfigModule.forRoot({
       ignoreEnvFile: false,
-      load: [dbConfig],
+      load: [generalConfig, dbConfig],
       isGlobal: true
     }),
     TypeOrmModule.forRootAsync({
