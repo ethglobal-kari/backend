@@ -27,7 +27,7 @@ export class Incentive {
     totalAmount: number
 
     @Column()
-    contractAddress: string
+    contractAddress?: string
 
     @Column()
     tokenAddress: string

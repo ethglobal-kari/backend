@@ -7,5 +7,8 @@ export class IncentiveController {
 
     }
 
-
+    // @Get('/create')
+    // async createIncentive(): Promise<any> {
+    //     await this.incentiveService.createIncentive()
+    // }
 }

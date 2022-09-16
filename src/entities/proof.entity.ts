@@ -34,13 +34,13 @@ export class Proof {
     description?: string
 
     @CreateDateColumn()
-    createdAt: Date
+    createdAt?: Date
 
     @UpdateDateColumn()
-    updatedAt: Date
+    updatedAt?: Date
 
     @DeleteDateColumn()
-    deletedAt: Date
+    deletedAt?: Date
 
     @ManyToOne(() => Incentive, (incentive) => incentive.proofs, {
         onDelete: 'RESTRICT',
