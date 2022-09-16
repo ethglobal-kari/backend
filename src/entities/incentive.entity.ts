@@ -30,6 +30,15 @@ export class Incentive {
     contractAddress: string
 
     @Column()
+    tokenAddress: string
+
+    @Column()
+    rootHash: string
+
+    @Column()
+    txhash: string
+
+    @Column()
     chainId: string
 
     @CreateDateColumn()

@@ -4,16 +4,23 @@ import {
     PrimaryColumn,
     CreateDateColumn,
     UpdateDateColumn,
-    DeleteDateColumn
+    DeleteDateColumn,
+    PrimaryGeneratedColumn
 } from 'typeorm'
 
 @Entity()
 export class Campaign {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn("uuid")
     campaignId: string
 
     @Column()
-    name: string
+    subject: string
+
+    @Column()
+    audienceId: string
+
+    @Column({ nullable: true })
+    audienceVersion?: number
 
     @Column()
     content: string
