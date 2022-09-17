@@ -11,3 +11,13 @@ export interface MerkleDto {
     proofs: Partial<Proof>[]
     rootHash: string
 }
+
+export interface ClaimDto {
+    contractAddress: string
+    tokenAddress: string
+    chainId: number
+    index: number
+    account: string
+    amount: number
+    proof: string[]
+}

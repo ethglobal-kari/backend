@@ -70,4 +70,19 @@ export class IncentiveService {
         await this.proofRepository.save(proofs, { chunk: 1000 })
         return incentive
     }
+
+    async getIncentive(incentiveId: string): Promise<Incentive> {
+        const qb = this.incentiveRepository.createQueryBuilder('in')
+            .where('in.incentiveId = :incentiveId', { incentiveId })
+        const incentive = await qb.getOne()
+        return incentive
+    }
+
+    async getProof(incentiveId: string, address: string): Promise<Proof> {
+        const qb = this.proofRepository.createQueryBuilder('p')
+            .where('p.incentiveId = :incentiveId', { incentiveId })
+            .andWhere('p.walletAddress = :address', { address })
+        const proof = await qb.getOne()
+        return proof
+    }
 }
