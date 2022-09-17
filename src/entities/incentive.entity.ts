@@ -39,7 +39,7 @@ export class Incentive {
     txhash: string
 
     @Column()
-    chainId: string
+    chainId: number
 
     @CreateDateColumn()
     createdAt: Date

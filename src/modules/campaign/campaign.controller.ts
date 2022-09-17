@@ -9,7 +9,7 @@ export class CampaignController {
     }
 
     @Post('/create')
-    async createCampaign(@Body() campaignCreateDto: CampaignCreateDto): Promise<any> {
+    async createCampaign(@Body() campaignCreateDto: CampaignCreateDto): Promise<void> {
         await this.campaignService.createCampaign(campaignCreateDto)
     }
 }

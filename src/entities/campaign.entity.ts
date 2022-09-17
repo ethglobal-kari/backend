@@ -10,7 +10,7 @@ import {
 
 @Entity()
 export class Campaign {
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryColumn("uuid")
     campaignId: string
 
     @Column()

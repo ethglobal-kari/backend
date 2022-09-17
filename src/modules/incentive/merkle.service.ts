@@ -26,7 +26,6 @@ export class MerkleService {
             jsonList[wallet.address] = amount
         })
         const merkleInfo = parseBalanceMap(jsonList)
-        console.log(merkleInfo)
 
         let proofs: Partial<Proof>[] = []
         const addrs = Object.keys(merkleInfo.claims)

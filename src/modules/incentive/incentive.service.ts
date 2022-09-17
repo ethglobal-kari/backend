@@ -11,6 +11,7 @@ import { MerkleService } from './merkle.service';
 import { v4 as uuidv4 } from 'uuid'
 import { ethers } from 'ethers'
 import * as FactoryArtifact from '../../../abis/DistributorFactory.json'
+import { Proof } from 'src/entities/proof.entity';
 
 @Injectable()
 export class IncentiveService {
@@ -24,30 +25,49 @@ export class IncentiveService {
         @InjectRepository(Audience)
         private readonly audienceRepository: Repository<Audience>,
         @InjectRepository(WalletAddress)
-        private readonly walletAddressRepository: Repository<WalletAddress>
+        private readonly walletAddressRepository: Repository<WalletAddress>,
+        @InjectRepository(Proof)
+        private readonly proofRepository: Repository<Proof>,
     ) {
 
     }
 
-    async createIncentive(campaign: Campaign, incentiveDto: IncentiveDto) {
+    async createIncentive(campaign: Campaign, incentiveDto: IncentiveDto): Promise<Partial<Incentive>> {
         // retrieve wallet address
         const addresses = await this.walletAddressRepository.createQueryBuilder('wa')
             .where('wa.audienceId = :audienceId', { audienceId: campaign.audienceId })
             .getMany()
         // calculate proofs
-        const amount = incentiveDto.totalAmount / incentiveDto.audienceSize
+        const { tokenAddress, totalAmount, audienceSize, chainId } = incentiveDto
+        const amount = totalAmount / audienceSize
         const incentiveId = uuidv4()
         const merkle = this.merkleService.createProofs(incentiveId, addresses, amount)
         // deploy contract
-        const rpcUrl = this.configService.get<string>(`eth.network[${incentiveDto.chainId}]`)
+        const rpcUrl = this.configService.get<string>(`eth.network[${chainId}]`)
         const privateKey = this.configService.get<string>('eth.privateKey')
-        const factoryAddress = this.configService.get<string>(`eth.factory[${incentiveDto.chainId}]`)
+        const factoryAddress = this.configService.get<string>(`eth.factory[${chainId}]`)
         const provider = ethers.providers.getDefaultProvider(rpcUrl)
         const wallet = new ethers.Wallet(privateKey, provider)
         const factory = new ethers.Contract(factoryAddress, FactoryArtifact.abi, wallet)
-        const tx = await factory.createDistributor(incentiveDto.tokenAddress, merkle.rootHash, incentiveId)
+        const tx = await factory.createDistributor(tokenAddress, merkle.rootHash, incentiveId)
         const response = await tx.wait()
         const contractAddress = response.events[0].args.distributor
+        const txhash = response.events[0].transactionHash
         // get contract address & save to incentive
+        const proofs = merkle.proofs.map(proof => this.proofRepository.create(proof))
+        const incentive: Partial<Incentive> = {
+            incentiveId,
+            campaignId: campaign.campaignId,
+            audienceSize,
+            totalAmount,
+            contractAddress,
+            tokenAddress,
+            rootHash: merkle.rootHash,
+            txhash,
+            chainId
+        }
+        await this.incentiveRepository.save(incentive)
+        await this.proofRepository.save(proofs, { chunk: 1000 })
+        return incentive
     }
 }

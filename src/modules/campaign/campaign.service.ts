@@ -5,6 +5,7 @@ import { Campaign } from 'src/entities/campaign.entity';
 import { Repository } from 'typeorm';
 import { IncentiveService } from '../incentive/incentive.service';
 import { CampaignCreateDto } from './campaign.dto';
+import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class CampaignService {
@@ -19,9 +20,10 @@ export class CampaignService {
     }
 
     async createCampaign(campaignCreateDto: CampaignCreateDto) {
-        console.log(campaignCreateDto)
-        const campaign = this.campaignRepository.create(campaignCreateDto)
-        // await this.campaignRepository.save(campaign)
+        const campaignId = uuidv4()
+        let campaign = this.campaignRepository.create(campaignCreateDto)
+        campaign.campaignId = campaignId
+        await this.campaignRepository.save(campaign)
         if (campaignCreateDto.incentive) {
             await this.incentiveService.createIncentive(campaign, campaignCreateDto.incentive)
         }
