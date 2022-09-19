@@ -2,12 +2,18 @@ import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { IncentiveService } from './incentive.service'
 import { Incentive } from 'src/entities/incentive.entity'
 import { Proof } from 'src/entities/proof.entity'
-import { ClaimDto } from "./incentive.dto";
+import { ClaimDto, IncentiveDto } from "./incentive.dto";
 
 @Controller('incentive')
 export class IncentiveController {
     constructor(private readonly incentiveService: IncentiveService) {
 
+    }
+
+    @Post('create')
+    async createIncentive(@Body() incentiveDto: IncentiveDto): Promise<Partial<Incentive>> {
+        const incentive = await this.incentiveService.createIncentive(incentiveDto)
+        return incentive
     }
 
     @Get(':incentiveId')

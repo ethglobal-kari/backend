@@ -14,8 +14,8 @@ export class Incentive {
     @PrimaryColumn()
     incentiveId: string
 
-    @Column()
-    campaignId: string
+    @Column({ nullable: true })
+    campaignId?: string
 
     @Column({ nullable: true })
     description?: string

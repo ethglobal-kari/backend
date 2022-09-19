@@ -32,13 +32,13 @@ export class IncentiveService {
 
     }
 
-    async createIncentive(campaign: Campaign, incentiveDto: IncentiveDto): Promise<Partial<Incentive>> {
+    async createIncentive(incentiveDto: IncentiveDto, campaignId?: string): Promise<Partial<Incentive>> {
         // retrieve wallet address
         const addresses = await this.walletAddressRepository.createQueryBuilder('wa')
-            .where('wa.audienceId = :audienceId', { audienceId: campaign.audienceId })
+            .where('wa.audienceId = :audienceId', { audienceId: incentiveDto.audienceId })
             .getMany()
         // calculate proofs
-        const { tokenAddress, totalAmount, audienceSize, chainId } = incentiveDto
+        const { tokenAddress, totalAmount, audienceSize, chainId, audienceId } = incentiveDto
         const amount = totalAmount / audienceSize
         const incentiveId = uuidv4()
         const merkle = this.merkleService.createProofs(incentiveId, addresses, amount)
@@ -57,7 +57,7 @@ export class IncentiveService {
         const proofs = merkle.proofs.map(proof => this.proofRepository.create(proof))
         const incentive: Partial<Incentive> = {
             incentiveId,
-            campaignId: campaign.campaignId,
+            campaignId,
             audienceSize,
             totalAmount,
             contractAddress,

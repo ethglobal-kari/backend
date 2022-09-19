@@ -25,7 +25,7 @@ export class CampaignService {
         campaign.campaignId = campaignId
         await this.campaignRepository.save(campaign)
         if (campaignCreateDto.incentive) {
-            await this.incentiveService.createIncentive(campaign, campaignCreateDto.incentive)
+            await this.incentiveService.createIncentive(campaignCreateDto.incentive, campaign.campaignId)
         }
     }
 

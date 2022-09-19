@@ -3,6 +3,7 @@ import { Proof } from "src/entities/proof.entity"
 export interface IncentiveDto {
     chainId: number
     tokenAddress: string
+    audienceId: string
     audienceSize: number
     totalAmount: number
 }
