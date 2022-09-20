@@ -12,6 +12,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { BigNumber, ethers } from 'ethers'
 import * as FactoryArtifact from '../../../abis/DistributorFactory.json'
 import * as DistributorArtifact from '../../../abis/IMerkleDistributor.json'
+import * as TokenArtifact from '../../../abis/MockToken.json'
 import { Proof } from 'src/entities/proof.entity';
 
 @Injectable()
@@ -53,6 +54,9 @@ export class IncentiveService {
         const response = await tx.wait()
         const contractAddress = response.events[0].args.distributor
         const txhash = response.events[0].transactionHash
+        // mint token to distributor
+        const token = new ethers.Contract(tokenAddress, TokenArtifact.abi, wallet)
+        await token.mint(contractAddress, totalAmount)
         // get contract address & save to incentive
         const proofs = merkle.proofs.map(proof => this.proofRepository.create(proof))
         const incentive: Partial<Incentive> = {
@@ -79,11 +83,17 @@ export class IncentiveService {
         const rpcUrl = this.configService.get<string>(`eth.network[${incentive.chainId}]`)
         const provider = ethers.providers.getDefaultProvider(rpcUrl)
         const distributor = new ethers.Contract(incentive.contractAddress, DistributorArtifact.abi, provider)
-        const claimed: BigNumber = await distributor.claimed()
+        let claimed = -1
+        try {
+            const response: BigNumber = await distributor.claimed()
+            claimed = response.toNumber()
+        } catch (err) {
+            console.log(err)
+        }
         const incentiveInfo: IncentiveInfo = {
             ...incentive,
             totalAmount: incentive.totalAmount.toString(),
-            claimed: claimed.toNumber()
+            claimed
         }
         return incentiveInfo
     }
