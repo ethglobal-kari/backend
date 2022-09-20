@@ -23,7 +23,7 @@ export class Incentive {
     @Column()
     audienceSize: number
 
-    @Column()
+    @Column('decimal')
     totalAmount: number
 
     @Column()

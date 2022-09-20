@@ -5,7 +5,7 @@ export interface IncentiveDto {
     tokenAddress: string
     audienceId: string
     audienceSize: number
-    totalAmount: number
+    totalAmount: string
 }
 
 export interface MerkleDto {

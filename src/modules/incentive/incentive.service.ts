@@ -39,7 +39,7 @@ export class IncentiveService {
             .getMany()
         // calculate proofs
         const { tokenAddress, totalAmount, audienceSize, chainId, audienceId } = incentiveDto
-        const amount = totalAmount / audienceSize
+        const amount = Number(totalAmount) / audienceSize
         const incentiveId = uuidv4()
         const merkle = this.merkleService.createProofs(incentiveId, addresses, amount)
         // deploy contract
@@ -59,7 +59,7 @@ export class IncentiveService {
             incentiveId,
             campaignId,
             audienceSize,
-            totalAmount,
+            totalAmount: Number(totalAmount),
             contractAddress,
             tokenAddress,
             rootHash: merkle.rootHash,
