@@ -20,9 +20,9 @@ export class AudienceService {
         const qb = this.walletAddressRepository.createQueryBuilder('wa')
             .where('wa.audienceId = :audienceId', { audienceId })
         qb.offset(offset ? offset : 0)
-        qb.limit(100)
+        qb.limit(1000)
         const [walletAddresses, count] = await qb.getManyAndCount()
-        return createPaginatedResponse(walletAddresses, count, 100, offset)
+        return createPaginatedResponse(walletAddresses, count, 1000, offset)
     }
 
 }
