@@ -8,6 +8,7 @@ import { dbConfig, generalConfig } from './configs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import * as path from 'path'
+import { AudienceModule } from './modules/audience/audience.module';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import * as path from 'path'
       }),
     }),
     IncentiveModule,
-    CampaignModule
+    CampaignModule,
+    AudienceModule
   ],
   controllers: [AppController],
   providers: [AppService],
