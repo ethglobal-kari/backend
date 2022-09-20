@@ -6,16 +6,16 @@ import { Campaign } from 'src/entities/campaign.entity';
 import { Incentive } from 'src/entities/incentive.entity';
 import { WalletAddress } from 'src/entities/walletAddress.entity';
 import { QueryBuilder, Repository } from 'typeorm';
-import { IncentiveDto } from './incentive.dto';
+import { IncentiveDto, IncentiveInfo } from './incentive.dto';
 import { MerkleService } from './merkle.service';
 import { v4 as uuidv4 } from 'uuid'
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 import * as FactoryArtifact from '../../../abis/DistributorFactory.json'
+import * as DistributorArtifact from '../../../abis/IMerkleDistributor.json'
 import { Proof } from 'src/entities/proof.entity';
 
 @Injectable()
 export class IncentiveService {
-
 
     constructor(
         private readonly configService: ConfigService,
@@ -49,7 +49,7 @@ export class IncentiveService {
         const provider = ethers.providers.getDefaultProvider(rpcUrl)
         const wallet = new ethers.Wallet(privateKey, provider)
         const factory = new ethers.Contract(factoryAddress, FactoryArtifact.abi, wallet)
-        const tx = await factory.createDistributor(tokenAddress, merkle.rootHash, incentiveId)
+        const tx = await factory.createDistributor(tokenAddress, merkle.rootHash, totalAmount, incentiveId)
         const response = await tx.wait()
         const contractAddress = response.events[0].args.distributor
         const txhash = response.events[0].transactionHash
@@ -71,11 +71,21 @@ export class IncentiveService {
         return incentive
     }
 
-    async getIncentive(incentiveId: string): Promise<Incentive> {
+    async getIncentive(incentiveId: string): Promise<IncentiveInfo> {
         const qb = this.incentiveRepository.createQueryBuilder('in')
             .where('in.incentiveId = :incentiveId', { incentiveId })
         const incentive = await qb.getOne()
-        return incentive
+        // find claimed
+        const rpcUrl = this.configService.get<string>(`eth.network[${incentive.chainId}]`)
+        const provider = ethers.providers.getDefaultProvider(rpcUrl)
+        const distributor = new ethers.Contract(incentive.contractAddress, DistributorArtifact.abi, provider)
+        const claimed: BigNumber = await distributor.claimed()
+        const incentiveInfo: IncentiveInfo = {
+            ...incentive,
+            totalAmount: incentive.totalAmount.toString(),
+            claimed: claimed.toNumber()
+        }
+        return incentiveInfo
     }
 
     async getProof(incentiveId: string, address: string): Promise<Proof> {

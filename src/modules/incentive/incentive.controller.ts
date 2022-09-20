@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { IncentiveService } from './incentive.service'
 import { Incentive } from 'src/entities/incentive.entity'
 import { Proof } from 'src/entities/proof.entity'
-import { ClaimDto, IncentiveDto } from "./incentive.dto";
+import { ClaimDto, IncentiveDto, IncentiveInfo } from "./incentive.dto";
 
 @Controller('incentive')
 export class IncentiveController {
@@ -17,7 +17,7 @@ export class IncentiveController {
     }
 
     @Get(':incentiveId')
-    async getIncentive(@Param('incentiveId') incentiveId: string): Promise<Incentive> {
+    async getIncentive(@Param('incentiveId') incentiveId: string): Promise<IncentiveInfo> {
         return await this.incentiveService.getIncentive(incentiveId)
     }
 

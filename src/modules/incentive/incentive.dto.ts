@@ -8,6 +8,23 @@ export interface IncentiveDto {
     totalAmount: string
 }
 
+export interface IncentiveInfo {
+    incentiveId: string
+    campaignId?: string
+    description?: string
+    audienceSize: number
+    claimed: number
+    totalAmount: string
+    contractAddress?: string
+    tokenAddress: string
+    rootHash: string
+    txhash: string
+    chainId: number
+    createdAt: Date
+    updatedAt: Date
+    deletedAt: Date
+}
+
 export interface MerkleDto {
     proofs: Partial<Proof>[]
     rootHash: string
