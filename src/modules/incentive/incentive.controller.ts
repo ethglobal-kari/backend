@@ -29,10 +29,10 @@ export class IncentiveController {
             contractAddress: incentive.contractAddress,
             tokenAddress: incentive.tokenAddress,
             chainId: incentive.chainId,
-            account: proof.walletAddress,
-            index: proof.proofIndex,
-            amount: proof.amount,
-            proof: proof.proofs
+            account: proof?.walletAddress,
+            index: proof?.proofIndex,
+            amount: proof?.amount,
+            proof: proof?.proofs
         }
     }
 }
