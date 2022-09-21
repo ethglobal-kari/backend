@@ -40,9 +40,9 @@ export class IncentiveService {
             .getMany()
         // calculate proofs
         const { tokenAddress, totalAmount, audienceSize, chainId, audienceId } = incentiveDto
-        const amount = Number(totalAmount) / audienceSize
+        const amount = BigNumber.from(totalAmount).div(audienceSize)
         const incentiveId = uuidv4()
-        const merkle = this.merkleService.createProofs(incentiveId, addresses, amount)
+        const merkle = this.merkleService.createProofs(incentiveId, addresses, amount.toNumber())
         // deploy contract
         const rpcUrl = this.configService.get<string>(`eth.network[${chainId}]`)
         const privateKey = this.configService.get<string>('eth.privateKey')
